@@ -1,0 +1,36 @@
+name: Weather Bot
+
+on:
+  schedule:
+    - cron: '0 4 * * *'  # 7 утра по московскому времени (UTC+3)
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.8'
+
+      - name: Install dependencies
+        run: |
+          python -m venv venv
+          source venv/bin/activate
+          pip install -r requirements.txt
+
+      - name: Run the bot
+        env:
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          WEATHER_API_KEY: ${{ secrets.WEATHER_API_KEY }}
+          CHAT_ID: ${{ secrets.CHAT_ID }}
+        run: |
+          source venv/bin/activate
+          python bot.py
